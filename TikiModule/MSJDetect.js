@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { MessageMedia } = require('whatsapp-web.js'); // Importar MessageMedia
 
 module.exports = (client) => {
     // Ruta del archivo de datos del bot
@@ -57,7 +58,7 @@ Powered: ${botData.Powered}
 
             // Leer el archivo de bienvenida
             const bienvenidaPath = path.join(__dirname, '..', 'TikiTXT', 'bienvenida.txt');
-            fs.readFile(bienvenidaPath, 'utf8', (err, data) => {
+            fs.readFile(bienvenidaPath, 'utf8', async (err, data) => {
                 if (err) {
                     console.error(`Error al leer el archivo de bienvenida: ${err.message}`);
                     return;
@@ -67,10 +68,25 @@ Powered: ${botData.Powered}
                     .replace('[Nombre del grupo]', groupName)
                     .replace('[Numero de el que ingreso al grupo]', number)
                     .replace('[Powered]', botData.Powered);
-                chat.sendMessage(bienvenidaMessage.trim());
-            });
 
-            console.log(`Número ${number} se ha unido al grupo "${groupName}"`);
+                // Ruta del archivo de video
+                const videoPath = path.join(__dirname, '..', 'temp', 'video.mp4');
+
+                // Leer el archivo de video y convertirlo a Base64
+                fs.readFile(videoPath, async (err, videoData) => {
+                    if (err) {
+                        console.error(`Error al leer el archivo de video: ${err.message}`);
+                        return;
+                    }
+                    const base64Video = videoData.toString('base64');
+                    const media = new MessageMedia('video/mp4', base64Video, 'video.mp4');
+
+                    // Enviar el mensaje de bienvenida y el video juntos
+                    await chat.sendMessage(media, { caption: bienvenidaMessage.trim() });
+
+                    console.log(`Mensaje de bienvenida y video enviados a ${number} en el grupo "${groupName}"`);
+                });
+            });
         } else {
             console.log(`Un participante se ha unido al grupo "${chat.name}", pero no se pudo obtener su número.`);
         }
