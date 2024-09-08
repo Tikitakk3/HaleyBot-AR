@@ -1,0 +1,6 @@
+NombreBot: 🍬  🎀  𝐻𝒶𝓁𝑒𝓎𝐵❀𝓉-𝒜𝑅  🎀  🍬
+Version: 1.0.0
+NombreCreador: Tikitakk3
+InstagramCreador: https://www.instagram.com/tikitakk3/
+GitHub: https://github.com/Tikitakk3/HaleyBot-AR
+Powered: Powered By Microsoft Copilot Pro

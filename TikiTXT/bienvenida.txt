@@ -1,0 +1,10 @@
+┎┈┈┈┈┈┈┈┈┈┈┈┈┈୨♡୧┈┈┈┈┈┈┈┈┈┈┈┈┈┒
+✧･ﾟ:Hola soy [Nombre del bot]
+✧･ﾟ:Bienvenido a "[Nombre del grupo]" !
+✧･ﾟ:[Numero de el que ingreso al grupo]
+✧･ﾟ:Veo que todavia no estas registrado...
+✧･ﾟ:Porfavor utiliza el comando:
+✧･ﾟ:> .reg
+✧･ﾟ:para registrarte
+┖┈┈┈┈┈┈┈┈┈┈┈┈┈୨♡୧┈┈┈┈┈┈┈┈┈┈┈┈┈┚
+> [Powered]
