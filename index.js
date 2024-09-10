@@ -42,6 +42,8 @@ client.on('ready', () => {
     console.log('Client is ready!');
     // Importar y ejecutar el módulo de detección de mensajes
     require(path.join(__dirname, 'TikiModule', 'MSJDetect'))(client);
+    // Importar y ejecutar el módulo de registro
+    require(path.join(__dirname, 'TikiModule', 'Tregister'))(client);
 
     // Configurar la ejecución periódica de TRVideo cada 5 minutos
     setInterval(runTRVideo, 5 * 60 * 1000);
