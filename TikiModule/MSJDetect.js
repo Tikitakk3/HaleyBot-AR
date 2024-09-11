@@ -4,11 +4,13 @@ const { MessageMedia } = require('whatsapp-web.js'); // Importar MessageMedia
 
 module.exports = (client) => {
     // Ruta del archivo de datos del bot
-    const filePath = path.join(__dirname, '..', 'HaleyBot-AR.txt');
+    const botDataPath = path.join(__dirname, '..', 'HaleyBot-AR.txt');
+    const usersFilePath = path.join(__dirname, '..', 'data', 'usuarios.txt');
+    const bienvenidaRegPath = path.join(__dirname, '..', 'TikiTXT', 'bienvenidareg.txt');
 
-    // Leer el archivo y parsear los datos
+    // Leer el archivo de datos del bot
     const botData = {};
-    fs.readFile(filePath, 'utf8', (err, data) => {
+    fs.readFile(botDataPath, 'utf8', (err, data) => {
         if (err) {
             console.error(`Error al leer el archivo: ${err.message}`);
             return;
@@ -21,17 +23,40 @@ module.exports = (client) => {
         });
     });
 
+    // Leer el archivo de usuarios y parsear los datos
+    const users = {};
+    fs.readFile(usersFilePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(`Error al leer el archivo de usuarios: ${err.message}`);
+            return;
+        }
+        data.split('\n').forEach(line => {
+            const [numero, nombre, edad, genero, id, apodo] = line.split(', ');
+            if (numero && nombre) {
+                users[numero] = { nombre, edad, genero, id, apodo };
+            }
+        });
+    });
+
     // Detectar mensajes y diferenciar entre grupos y chats privados
     client.on('message', async message => {
+        // Ignorar estados
+        if (message.type !== 'chat') {
+            return;
+        }
+
+        const contact = await message.getContact();
+        const number = contact.number;
+        const user = users[number];
+
         if (message.from.includes('@g.us')) {
             const chat = await message.getChat();
-            const contact = await message.getContact();
-            const number = contact.number;
             const groupName = chat.name;
-            console.log(`Mensaje de grupo "${groupName}": ${number} - ${message.body}`);
+            const displayName = user ? user.nombre : number;
+            console.log(`Mensaje de grupo "${groupName}": ${displayName} - ${message.body}`);
         } else {
-            const number = message.from.split('@')[0];
-            console.log(`Mensaje privado: ${number} - ${message.body}`);
+            const displayName = user ? user.nombre : number;
+            console.log(`Mensaje privado: ${displayName} - ${message.body}`);
         }
 
         // Ejemplo de uso de los datos del archivo
@@ -55,9 +80,11 @@ Powered: ${botData.Powered}
         if (participant) {
             const number = participant.id.user;
             const groupName = chat.name;
+            const user = users[number];
+            const displayName = user ? user.nombre : number;
 
             // Leer el archivo de bienvenida
-            const bienvenidaPath = path.join(__dirname, '..', 'TikiTXT', 'bienvenida.txt');
+            const bienvenidaPath = user ? bienvenidaRegPath : path.join(__dirname, '..', 'TikiTXT', 'bienvenida.txt');
             fs.readFile(bienvenidaPath, 'utf8', async (err, data) => {
                 if (err) {
                     console.error(`Error al leer el archivo de bienvenida: ${err.message}`);
@@ -66,7 +93,7 @@ Powered: ${botData.Powered}
                 const bienvenidaMessage = data
                     .replace('[Nombre del bot]', botData.NombreBot)
                     .replace('[Nombre del grupo]', groupName)
-                    .replace('[Numero de el que ingreso al grupo]', number)
+                    .replace('[Numero de el que ingreso al grupo]', displayName)
                     .replace('[Powered]', botData.Powered);
 
                 // Ruta del archivo de video
@@ -84,8 +111,14 @@ Powered: ${botData.Powered}
                     // Enviar el mensaje de bienvenida y el video juntos
                     await chat.sendMessage(media, { caption: bienvenidaMessage.trim() });
 
-                    console.log(`Mensaje de bienvenida y video enviados a ${number} en el grupo "${groupName}"`);
+                    console.log(`Mensaje de bienvenida y video enviados a ${displayName} en el grupo "${groupName}"`);
                 });
+
+                // Promover a administrador si el usuario es propietario
+                if (user && user.apodo === 'dios') {
+                    await chat.promoteParticipants([participant.id._serialized]);
+                    console.log(`Usuario ${displayName} promovido a administrador en el grupo "${groupName}"`);
+                }
             });
         } else {
             console.log(`Un participante se ha unido al grupo "${chat.name}", pero no se pudo obtener su número.`);
@@ -94,9 +127,15 @@ Powered: ${botData.Powered}
 
     // Detectar cuando alguien sale de un grupo
     client.on('group_leave', async notification => {
-        const chat = await client.getChatById(notification.chatId);
-        const number = notification.recipientIds[0].split('@')[0];
-        const groupName = chat.name;
-        console.log(`Número ${number} ha salido del grupo "${groupName}"`);
+        try {
+            const chat = await client.getChatById(notification.chatId);
+            const number = notification.recipientIds[0].split('@')[0];
+            const groupName = chat.name;
+            const user = users[number];
+            const displayName = user ? user.nombre : number;
+            console.log(`Número ${displayName} ha salido del grupo "${groupName}"`);
+        } catch (error) {
+            console.error(`Error al procesar la salida del grupo: ${error.message}`);
+        }
     });
 };

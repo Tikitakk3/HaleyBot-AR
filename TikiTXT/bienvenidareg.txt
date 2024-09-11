@@ -2,9 +2,8 @@
 ✧･ﾟ:Hola soy [Nombre del bot]
 ✧･ﾟ:Bienvenido a "[Nombre del grupo]" !
 ✧･ﾟ:[Numero de el que ingreso al grupo]
-✧･ﾟ:Veo que todavia no estas registrado...
-✧･ﾟ:Porfavor utiliza el comando:
-✧･ﾟ: ".registar"
-✧･ﾟ:para registrarte
+✧･ﾟ:Veo que ya estas registrado
+✧･ﾟ:Asi que simplemente disfruta
+✧･ﾟ:de tu estancia
 ┖┈┈┈┈┈┈┈┈┈┈┈┈୨♡୧┈┈┈┈┈┈┈┈┈┈┈┈┚
 > [Powered]
